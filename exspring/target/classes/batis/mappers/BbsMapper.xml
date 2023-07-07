@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--   이 파일이 감고있는 SQL문들 집합의 고유한 이름을 namespace 속성값으로 설정 -->
+<!--   일반적으로 이 SQL문들을 실행할 때 사용할 DAO인터페이스 이름을 지정 -->
+<mapper namespace="com.exam.myapp.bbs.BbsDao">
+
+	<!-- resultMap을 사용하여 초회결과의 어떤 컬럼값을 BbsVo 객체의 어떤 속성(변수)에 담을지(저장) 설정 -->
+	<resultMap type="BbsVo" id="BbsMap">
+		<!-- 기본키(PK)에 해당되는 컬럼에 대해서는 result 대신 ip 태그 사용 -->
+		<id property="bbsNo" column="bbs_no" />
+		<result property="bbsTitle" 	column="bbs_title" />
+		<result property="bbsContent" 	column="bbs_content" />
+		<result property="bbsWriter" 	column="bbs_writer" />
+		<result property="bbsRegDate" 	column="bbs_reg_date" />
+		<result property="bbsCount" 	column="bbs_count" />
+		
+		<!-- JOIN 조회결과를 담기 위한 resultMap 설정 : 1:1 관계이면 association 엘리먼트를, 1:N 관계이면 collection 엘리먼트를 사용(게시물이 많을수록 좋음) -->
+		<!-- <collection property="attachList" ofType="AttachVo">
+			<id 	property="attNo" 		column="att_no" />
+			<result property="attOrgName" 	column="att_org_name" />
+			<result property="attNewName" 	column="att_new_name" />
+			<result property="attBbsNo" 	column="att_bbs_no" />
+		</collection> -->
+		
+		<!-- select로 다른 맵퍼에 있는 것을 가져올려면 네임스페이스까지 지정해줘야 한다, -->
+		<!-- bbs_no 컬럼값을 파라미터로 전달하면서 "com.exam.myapp.bbs.AttachDao.selectAttachList"인 SQL문을 실행하고, -->
+		<!-- 그 결과를 attachList 속성값으로 저장 -게시물이 몇개 없을 경우 좋음-  -->
+		<collection property="attachList" ofType="AttachVo" select="com.exam.myapp.bbs.AttachDao.selectAttachList" column="bbs_no" />
+				
+	</resultMap>
+	<!-- 등록할 SQL문과 동일한 이름의 태그를 사용하여 SQL을 등록 -->
+	<!-- 이 파일 내에서 해당 SQL문의 고유한 이름을 id 속성값으로 설정 -->
+	<!-- 일반적으로 이 SQL문을 실행할 때 사용할 DAO인터페이스의 메서드 이름을 지정 -->
+	<!-- select 실행 결과의 한 행(row)를 담을 객체의 클래스명을 resultType 속성에 설정 -->
+	<select id="selectBbsList" resultType="BbsVo">	<!-- 바티스셋팅(값 true) 해줘야 목록이 뜬다 -->
+	<!-- resultMap속성을 사용하여, id가 MemberMap인 resultMap에 써놓은대로 조회결과를 담도록 설정 -->
+	<!--   <select id="selectMemberList" resultMap="MemberMap"> --> <!-- 리설트맵을 불러와라 -->
+    SELECT 		bbs_no, bbs_title, bbs_writer, bbs_reg_date, bbs_count
+	FROM 		bbs
+	ORDER BY 	bbs_no DESC
+  </select>
+  
+  	<!-- 게시글 상세 -->
+	<select id="selectBbs" resultMap="BbsMap">	<!-- 바티스셋팅(값 true) 해줘야 목록이 뜬다 -->
+	<!-- resultMap속성을 사용하여, id가 MemberMap인 resultMap에 써놓은대로 조회결과를 담도록 설정 -->
+	<!--   <select id="selectMemberList" resultMap="MemberMap"> --> <!-- 리설트맵을 불러와라 -->
+	<!-- SELECT 	bbs_no, bbs_title, bbs_content, bbs_writer, bbs_reg_date, bbs_count, att_no, att_org_name, att_new_name, att_bbs_no
+	FROM 	(
+			  SELECT bbs_no, bbs_title, bbs_content, bbs_writer, bbs_reg_date, bbs_count
+			  FROM	 bbs
+			  WHERE  bbs_no = #{bbsNo}
+			) 
+      		LEFT OUTER JOIN attach ON bbs_no = att_bbs_no;  - 게시물이 많을수록 좋음 - -->
+	
+	SELECT 	bbs_no, bbs_title, bbs_content, bbs_writer, bbs_reg_date, bbs_count
+	FROM	bbs
+	WHERE 	bbs_no = #{bbsNo}
+  </select>
+  
+  <!--   파라미터(인자)로 받은 객체의 속성값들을 SQL문 내에 사용하기 위해서 #{속성명} 또는 &{속성명} 표현을 사용
+  #{속성명} : JDBC의 ? 채우기와 같은 방식으로 동작
+  &{속성명} : 문자열 이어붙이기 방식으로 동작 (보안상 위험하므로 가급적 사용자제) -->
+  <!-- 게시판 등록 -->
+  <insert id="insertBbs" > <!-- 파라미터 타입은 생략 해도됨-->
+  	<selectKey keyProperty="bbsNo" resultType="int" order="BEFORE"> <!-- 시퀀스값을 먼저 구함 -->
+  		SELECT bbs_seq.NEXTVAL  FROM dual	--시퀀스의 다음값(조회 할떄마다 1++한다)
+  	</selectKey>
+  	INSERT INTO bbs ( bbs_no, bbs_title, bbs_content, bbs_writer )
+	VALUES ( #{bbsNo}, #{bbsTitle}, #{bbsContent}, #{bbsWriter} )
+  </insert>
+<!-- SQL문 실행시 전달받는 데이터의 타입을 parameterType 속성에 지정 가능(생략 가능) -->
+<!-- 문자열, 정수 등 단일값을 갖는 데이터를 파라미터(인자)로 받은 경우, #{속성명} 의 속성명에는 어떤 이름을 써도 무방 -->
+<!-- 밀반적으로 value 또는 변수명을 사용 -->
+
+	<!-- 게시글 수정 -->
+  <update id="updateBbs">
+  	UPDATE bbs
+  	SET  bbs_title = #{bbsTitle}, bbs_content = #{bbsContent}
+  	WHERE bbs_no = #{bbsNo}
+  </update>
+  
+  <!-- 게시글 삭제 -->
+  <delete id="deleteBbs">
+  DELETE
+  FROM bbs
+  WHERE bbs_no = #{bbsNo}
+  </delete>
+  
+</mapper>

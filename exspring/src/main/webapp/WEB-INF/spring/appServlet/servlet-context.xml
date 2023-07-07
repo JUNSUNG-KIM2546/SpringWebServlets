@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+	
+	<!-- @Controller와 같은 애노테이션을 사용한 컨트롤러를 사용하여 요청을 처리할 때 필요한 객체들을 자동으로 등록 -->
+	<annotation-driven /> <!-- 자동 등록 -->
+
+	<!-- "/resources/**" 경로로 GET방식 요청을 받으면, "/resources/**" 파일을 찾아서 응답으로 전송하는 컨트롤러(핸들러)를 등록 -->
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- 컨트롤러(@Controller)에서 뷰이름(문자열)을 반환한 경우, 반환한 뷰이름의 앞과 뒤에 "/WEB-INF/views/" 와 ".jsp"를 붙인 후,
+		해당 경로로 이동(forward)시키도록 설정  -->
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+	
+	<!-- com.exam.myapp 패키지의 하위에 있는 @Component, @Controller, @Service, @Repository, @Configuration 등이 적용된 클래드들을 스프링(객체 컨테이너)에 등록 -->
+	<context:component-scan base-package="com.exam.myapp" />
+	
+	<!-- 파일이 포함된 멀티파트 form 데이터를 해석할 수 있도록 CommonsMultipartResolver 또는 StandardServletMultipartResolver를 'multipartResolver'라는 이름으로 스프링에 등록 -->
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 한 요청 당 최대 업로드(파일) 용량(바이트)을 설정 -1:기본값(무제한) -->
+		<beans:property name="maxUploadSize" value="-1"/>
+	</beans:bean>
+	
+	<!-- 핸들러인터셉터 등록 -->
+	<interceptors>
+		<interceptor>
+			<!-- 인터셉터를 실행할 요청 경로(주소) 설정 -->
+			<mapping path="/**"/>
+			<!-- 인터셉터를 실행하지 않을 요청 경로(주소) 설정 -->
+			<exclude-mapping path="/member/login.do" />
+			<exclude-mapping path="/member/add.do" />
+			<!-- 실행할 인터셉터 클래스 설정 -->
+			<beans:bean class="com.exam.myapp.comm.LoginInterceptor" />
+		</interceptor>
+	</interceptors>
+	
+	<!-- location 속성에 지정한 프로퍼티 파일의 값을 읽어서 스프링 컨테이너에(프로퍼티 값으로) 등록 -->
+	<!-- 스프링 XML 설정파일 또는 @value 에서 ${프로퍼티키} 표현으로 프로퍼티값을 사용 가능 -->
+	<context:property-placeholder location="classpath:config/file.properties"/>
+	
+	<!-- 데이터베이스 입출력을 위한 객체들을 등록하는 부분 -->
+	
+	<!-- 스프링의 트랜잭션 설정 방식 -->
+	<!-- -자바코드에 @Transactional 애노테이션을 사용 -->
+	<!-- -스프링 설정파일에 <tx:advice> 엘리먼트 사용 -->
+	
+	<!-- @Transactional을 이용한 트랜잭션 처리에 필요한 객체들을 자동 등록 -->
+	<tx:annotation-driven/>
+	
+  	<!-- 스프링의 트랜잭션 관리를 담당할 객체 등록 -->
+	<beans:bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	  <beans:property name="dataSource" ref="ds" />
+	</beans:bean>
+	
+  <!-- 데이터베이스 접속 정보 설정 -->
+	<beans:bean id="ds" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+		<beans:property name="driverClassName" 	value="oracle.jdbc.OracleDriver" />
+		<beans:property name="url" 				value="jdbc:oracle:thin:@localhost:1521:xe" />
+		<beans:property name="username" 		value="WEB" />
+		<beans:property name="password" 		value="WEB01" />
+	</beans:bean>
+	
+  <!-- 마이바티스 설정 -->
+	<beans:bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	  	<beans:property name="dataSource" ref="ds" />
+			<!-- 1.3.0 버전부터 XML 설정 파일 대신 직접 지정 가능 -->
+<!-- 			 <beans:property name="configuration">
+		     <beans:bean class="org.apache.ibatis.session.Configuration">
+		       <beans:property name="mapUnderscoreToCamelCase" value="true"/>
+		     </beans:bean>
+		   </beans:property>
+		   <beans:property name="typeAliasesPackage" value="com.exam.myapp"/> -->
+		  <!-- 마이바티스 전체 설정 파일 위치 -->
+		<beans:property name="configLocation" value="classpath:batis/mybatis-config.xml" />
+ 		<!-- 마이바티스가 실행할 SQL문들을 담고 있는 매퍼 XML 파일들을 등록 -->
+	  	<beans:property name="mapperLocations" value="classpath*:batis/mappers/**/*.xml" />
+	</beans:bean>
+	
+<!-- 	<beans:bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+  		<beans:constructor-arg index="0" ref="sqlSessionFactory" />
+	</beans:bean> -->
+	
+	
+  	<!-- com.exam.myapp 패키지 하위에 있는 @Mapper가 붙어있는 인터페이스의 구현체를 자동 생성 및 등록 -->
+	<mybatis-spring:scan base-package="com.exam.myapp" annotation="org.apache.ibatis.annotations.Mapper"/>
+	
+	
+</beans:beans>

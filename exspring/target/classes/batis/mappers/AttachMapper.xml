@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--   이 파일이 감고있는 SQL문들 집합의 고유한 이름을 namespace 속성값으로 설정 -->
+<!--   일반적으로 이 SQL문들을 실행할 때 사용할 DAO인터페이스 이름을 지정 -->
+<mapper namespace="com.exam.myapp.bbs.AttachDao">
+
+	
+	<!-- 등록할 SQL문과 동일한 이름의 태그를 사용하여 SQL을 등록 -->
+	<!-- 이 파일 내에서 해당 SQL문의 고유한 이름을 id 속성값으로 설정 -->
+	<!-- 일반적으로 이 SQL문을 실행할 때 사용할 DAO인터페이스의 메서드 이름을 지정 -->
+	<!-- select 실행 결과의 한 행(row)를 담을 객체의 클래스명을 resultType 속성에 설정 -->
+	<select id="selectAttachList" resultType="AttachVo">	<!-- 바티스셋팅(값 true) 해줘야 목록이 뜬다 -->
+	<!-- resultMap속성을 사용하여, id가 MemberMap인 resultMap에 써놓은대로 조회결과를 담도록 설정 -->
+	<!--   <select id="selectMemberList" resultMap="MemberMap"> --> <!-- 리설트맵을 불러와라 -->
+    SELECT att_no, att_org_name, att_new_name, att_bbs_no
+	FROM attach
+	WHERE att_bbs_no = #{attBbsNo}
+  </select>
+  
+  	<!-- 첨부파일 조회 -->
+	<select id="selectAttach" resultType="AttachVo">	<!-- 바티스셋팅(값 true) 해줘야 목록이 뜬다 -->
+	<!-- resultMap속성을 사용하여, id가 MemberMap인 resultMap에 써놓은대로 조회결과를 담도록 설정 -->
+	<!--   <select id="selectMemberList" resultMap="MemberMap"> --> <!-- 리설트맵을 불러와라 -->
+    SELECT att_no, att_org_name, att_new_name, att_bbs_no
+	FROM attach
+	WHERE att_no = #{attNo}
+  </select>
+  
+  <!--   파라미터(인자)로 받은 객체의 속성값들을 SQL문 내에 사용하기 위해서 #{속성명} 또는 &{속성명} 표현을 사용
+  #{속성명} : JDBC의 ? 채우기와 같은 방식으로 동작
+  &{속성명} : 문자열 이어붙이기 방식으로 동작 (보안상 위험하므로 가급적 사용자제) -->
+  <!-- 첨부파일 등록 -->
+  <insert id="insertAttach" > <!-- 파라미터 타입은 생략 해도됨-->
+  	INSERT INTO attach ( att_no, att_org_name, att_new_name, att_bbs_no )
+	VALUES ( att_seq.NEXTVAL, #{attOrgName}, #{attNewName}, #{attBbsNo} )
+  </insert>
+<!-- SQL문 실행시 전달받는 데이터의 타입을 parameterType 속성에 지정 가능(생략 가능) -->
+<!-- 문자열, 정수 등 단일값을 갖는 데이터를 파라미터(인자)로 받은 경우, #{속성명} 의 속성명에는 어떤 이름을 써도 무방 -->
+<!-- 밀반적으로 value 또는 변수명을 사용 -->
+
+	<!-- 게시글 수정 -->
+  <update id="updateBbs">
+  	UPDATE bbs
+  	SET  bbs_title = #{bbsTitle}, bbs_content = #{bbsContent}
+  	WHERE bbs_no = #{bbsNo}
+  </update>
+  
+  <!-- 첨부파일 삭제 -->
+  <delete id="deleteAttach">
+  DELETE FROM attach
+  WHERE att_no = #{attNo}
+  </delete>
+  
+</mapper>

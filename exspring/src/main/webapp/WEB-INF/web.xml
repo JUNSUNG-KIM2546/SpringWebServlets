@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee                       http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+
+	<!-- The definition of the Root Spring Container shared by all Servlets and Filters -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/spring/root-context.xml</param-value> <!-- 스프링 객체 컨테이너 등록 -->
+	</context-param>
+	
+	<!-- 웹애플리케이션(서버)가 실행되면 최초 1회 실행 -->
+	<!-- /WEB-INF/spring/root-context.xml에 써있는대로 스프링 객체 컨테이너 생성 -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- /WEB-INF/spring/appServlet/servlet-context.xml 에 써있는대로 스프링 객체 컨테이너를 생성 -->
+	<!-- (ContextLoaderListener가 생성한 스프링 객체 컨테이너가 있다면 부모 컨테이너로 설정) -->
+	<!-- 스프링 컨테이너에 등록된객체들을 사용하여 요청을 처리 -->
+	<servlet>
+		<servlet-name>appServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/spring/appServlet/servlet-context.xml</param-value><!-- 스프링 객체 컨테이너 등록 -->
+		</init-param>
+		<load-on-startup>1</load-on-startup> <!-- 서버 실행시 미리 만들어두는 -->
+	</servlet>
+		
+	<!-- 다른 JSP 파일 또는 서블릿과 연결되지 않은 모든 주소(경로)에 대한 요청을 처리하도록 등록 -->
+	<servlet-mapping>
+		<servlet-name>appServlet</servlet-name>
+		<url-pattern>/</url-pattern> <!-- default servlet 경로 :  -->
+	</servlet-mapping>
+	
+	<filter>
+		<filter-name>encoding-filter</filter-name> 
+		<filter-class>
+			org.springframework.web.filter.CharacterEncodingFilter 
+		</filter-class>
+		<init-param>
+			<param-name>encoding</param-name> 
+			<param-value>UTF-8</param-value>
+		</init-param> 
+	</filter>
+	<filter-mapping>
+		<filter-name>encoding-filter</filter-name> 
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+</web-app>
+
+<!-- Web Server(웹 서버) : 정적인 서버, 자기가 관리하는 폴더에서 해당파일을 읽어오는(정적인 파일을 찾아 읽어오는) -->
+
+<!-- Web Application Server(웹 애플리케이션 서버) : 프린트한 내용을 응답으로 보내주는, 구분이 엄격할때 Servlet container & Web Application Server 로 나뉨 -->
