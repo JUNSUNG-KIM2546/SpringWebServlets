@@ -11,6 +11,6 @@ public interface ReplyDao {
 
 	public List<ReplyVo> selectReplyList(int repBbsNo);
 
-	public int deleteReply(int repNo);
+	public int deleteReply(ReplyVo rvo);
 	
 }

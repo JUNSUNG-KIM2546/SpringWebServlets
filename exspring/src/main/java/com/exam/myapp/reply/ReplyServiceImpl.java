@@ -25,10 +25,8 @@ public class ReplyServiceImpl implements ReplyService {
 	}
 
 	@Override
-	public int deleteBbs(int repNo) {
-		return replyDao.deleteReply(repNo);
+	public int deleteReply(ReplyVo rvo) {
+		return replyDao.deleteReply(rvo);
 	}
-
-	
 
 }

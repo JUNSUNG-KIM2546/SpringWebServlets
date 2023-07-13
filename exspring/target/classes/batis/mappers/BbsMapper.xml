@@ -78,7 +78,7 @@
   <update id="updateBbs">
   	UPDATE bbs
   	SET  bbs_title = #{bbsTitle}, bbs_content = #{bbsContent}
-  	WHERE bbs_no = #{bbsNo}
+  	WHERE bbs_no = #{bbsNo} AND bbs_writer = #{bbsWriter}
   </update>
   
   <!-- 게시글 삭제 -->

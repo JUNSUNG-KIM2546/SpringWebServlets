@@ -20,15 +20,6 @@
 	ORDER BY rep_reg_date DESC
   </select>
   
-  	<!-- 첨부파일 조회 -->
-	<select id="selectAttach" resultType="ReplyVo">	<!-- 바티스셋팅(값 true) 해줘야 목록이 뜬다 -->
-	<!-- resultMap속성을 사용하여, id가 MemberMap인 resultMap에 써놓은대로 조회결과를 담도록 설정 -->
-	<!--   <select id="selectMemberList" resultMap="MemberMap"> --> <!-- 리설트맵을 불러와라 -->
-    SELECT att_no, att_org_name, att_new_name, att_bbs_no
-	FROM attach
-	WHERE att_no = #{attNo}
-  </select>
-  
   <!--   파라미터(인자)로 받은 객체의 속성값들을 SQL문 내에 사용하기 위해서 #{속성명} 또는 &{속성명} 표현을 사용
   #{속성명} : JDBC의 ? 채우기와 같은 방식으로 동작
   &{속성명} : 문자열 이어붙이기 방식으로 동작 (보안상 위험하므로 가급적 사용자제) -->
@@ -52,6 +43,7 @@
   <delete id="deleteReply">
   DELETE FROM reply
   WHERE rep_no = #{repNo}
+  AND	rep_writer = #{repWriter}
   </delete>
   
 </mapper>

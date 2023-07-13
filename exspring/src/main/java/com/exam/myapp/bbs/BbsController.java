@@ -75,8 +75,9 @@ public class BbsController {
 		return "bbs/bbsEdit";
 	}
 	@PostMapping("edit.do")	//@RequestMapping(path = "edit.do", method = RequestMethod.POST)
-	public String edit(BbsVo vo) {
-//		req.setCharacterEncoding("UTF-8");	//필터로 이동
+	public String edit(BbsVo vo, @SessionAttribute("loginUser") MemberVo mvo) {
+		
+		vo.setBbsWriter( mvo.getMemId() );
 		
 		int n = bbsService.updateBbs(vo);	//클래스 참조하라
 		System.out.println(n + "개의 게시글 수정");
@@ -87,9 +88,11 @@ public class BbsController {
 	
 	//게시글 삭제
 	@GetMapping("del.do")	//@RequestMapping(path = "del.do", method = RequestMethod.GET)
-	public String del(int bbsNo) {		
+	public String del(BbsVo vo, @SessionAttribute("loginUser") MemberVo mvo) {		
 		
-		int n = bbsService.deleteBbs(bbsNo);	//클래스 참조하라
+		vo.setBbsWriter( mvo.getMemId() );
+		
+		int n = bbsService.deleteBbs(vo);	//클래스 참조하라
 		System.out.println( n + "개의 게시글 삭제");
 		
 		// 삭제 후 바로 리스트 창으로 가라

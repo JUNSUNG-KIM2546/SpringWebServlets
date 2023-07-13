@@ -12,7 +12,7 @@ public interface BbsService {
 	int insertBbs(BbsVo vo);
 
 	// 게시글 삭제
-	int deleteBbs(int bbsNo);
+	int deleteBbs(BbsVo vo);
 	
 	// 게시글 수정
 	int updateBbs(BbsVo vo);
