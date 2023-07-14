@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
@@ -35,9 +36,12 @@ public class BbsController {
 	//스프링 방식//
 	//게시판리스트
 	@GetMapping("list.do")	//@RequestMapping(path = "list.do", method = RequestMethod.GET)
-	public String list(Model model) {	
+	public String list(Model model, SearchInfo info) {
+		int cnt = bbsService.selectBbsCount(info);//전체 레코드 수 조회
+		info.setTotalRecordCount(cnt);	//전체 레코드 수 정보 설정
+		info.makePageHtml();	//페이지 처리에 필요한 값들 계산
 		
-		List<BbsVo> List = bbsService.selectBbsList();	
+		List<BbsVo> List = bbsService.selectBbsList(info);	
 		
 		model.addAttribute("bbsList", List);
 		

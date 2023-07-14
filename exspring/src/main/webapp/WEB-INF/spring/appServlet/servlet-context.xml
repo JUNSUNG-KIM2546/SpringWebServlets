@@ -22,8 +22,26 @@
 	<!-- 컨트롤러(@Controller)에서 뷰이름(문자열)을 반환한 경우, 반환한 뷰이름의 앞과 뒤에 "/WEB-INF/views/" 와 ".jsp"를 붙인 후,
 		해당 경로로 이동(forward)시키도록 설정  -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<beans:property name="prefix" value="/WEB-INF/views/" />
-		<beans:property name="suffix" value=".jsp" />
+		<!-- JstlView : JSTL 지원 기능 향상(스프링이 관리하는 메시지 사용) -->
+		<beans:property name="viewClass" 	value="org.springframework.web.servlet.view.JstlView" />
+		<beans:property name="prefix" 		value="/WEB-INF/views/" />
+		<beans:property name="suffix" 		value=".jsp" />
+		<beans:property name="order"  		value="2" />
+	</beans:bean>
+	
+	<!-- 뷰이름과 동일한 이름의 화면을 출력하는 TilesView를 제공해주는 ViewResolver 등록 --> 
+	<!-- order 속성값으로 스프링에 등록된 ViewResolver들이 사용되는 순서를 지정 -->
+	<beans:bean class="org.springframework.web.servlet.view.tiles3.TilesViewResolver">
+		<beans:property name="order"  value="1"></beans:property>
+	</beans:bean>
+	
+	<!-- 타일즈 (화면을 정의한) 설정파일 로드 -->
+	<beans:bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+	  <beans:property name="definitions">
+	    <beans:list>
+	      <beans:value>/WEB-INF/tiles/tiles.xml</beans:value>
+	    </beans:list>
+	  </beans:property>
 	</beans:bean>
 	
 	<!-- com.exam.myapp 패키지의 하위에 있는 @Component, @Controller, @Service, @Repository, @Configuration 등이 적용된 클래드들을 스프링(객체 컨테이너)에 등록 -->

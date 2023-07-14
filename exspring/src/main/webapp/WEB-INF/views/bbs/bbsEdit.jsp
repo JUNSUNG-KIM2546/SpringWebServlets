@@ -3,37 +3,37 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
 <meta charset='UTF-8'>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title> 게시글 수정 </title>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS" crossorigin="anonymous"></script>
 </head>
-<body>
+<body> -->
 
-<jsp:include page="/WEB-INF/views/menu.jsp" />
+<%-- <jsp:include page="/WEB-INF/views/menu.jsp" /> --%>
 
 <h1> 게시글 수정 </h1>
 
 <form action='${pageContext.request.contextPath}/bbs/edit.do' method='post'>
+		<c:set value="${bvo.bbsWriter eq loginUser.memId}" var="isMine" /> <!-- 이름이 긴거를 변수처리 -->
 		<%-- 아이디 : 	 <input type="hidden" name='memId' value='<c:out value="${mbvo.memId}" />'/><br> 아이디 변경하지 못하게 인풋타입을 히든으로 --%>
 					<input type="hidden"	name='bbsNo' 	value='<c:out value="${bvo.bbsNo}" />' readonly="readonly"/><br> <!-- 아이디 변경하지 못하게 readonly="readonly" -->
-		제목 : 		<input type="text" 		name='bbsTitle' value='<c:out value="${bvo.bbsTitle}" />' /><br>
-		내용 : 		<textarea name="bbsContent" rows="10" cols="60"><c:out value="${bvo.bbsContent}"/></textarea><br>
+		제목 : 		<input 		<c:if test="${bvo.bbsWriter != loginUser.memId}">readonly</c:if> type="text" name='bbsTitle' value='<c:out value="${bvo.bbsTitle}" />' /><br>
+		내용 : 		<textarea ${bvo.bbsWriter != loginUser.memId ? 'readonly' : ''} name="bbsContent" rows="10" cols="60"><c:out value="${bvo.bbsContent}"/></textarea><br>
 		<c:forEach var="vo" items="${bvo.attachList}">
 			첨부 파일 : <a href="${pageContext.request.contextPath}/bbs/down.do?attNo=${vo.attNo}"><c:out value="${vo.attOrgName}"/></a><br>
 		</c:forEach>
  		작성자 : 		<c:out value="${bvo.bbsWriter}" /><br>
  		등록일 : 		<fmt:formatDate value="${bvo.bbsRegDate}" pattern="yyyy/MM/dd HH:mm:ss"/><br>
 		조회수 : 		<c:out value="${bvo.bbsCount}" /><br>
-		<!-- 게시물 작성자만 삭제 -->
+		<!-- 게시물 작성자만 저장, 삭제 -->
 		<c:if  test="${bvo.bbsWriter eq loginUser.memId}">
 			<input id="saves" type='submit' value="저장" />	
 			<a id="dell" href='${pageContext.request.contextPath}/bbs/del.do?bbsNo=${bvo.bbsNo}'><button type='button'> 삭제 </button></a>
 		</c:if>
+		
 </form>
 
 <hr>
@@ -55,7 +55,6 @@
 	<hr>
 </template>
 
-<script src="${pageContext.request.contextPath}/resources/js/jquery-3.7.0.js"></script>
 <script type="text/javascript">
 		
 //댓글을 추가하면, 곧바로 댓글목록에 출력되도록 구현, 각 댓글 아래에 삭제 버튼을 출력
@@ -222,6 +221,6 @@
 		<button type='button'> 게시판 목록 </button>
 	</a>
 		
-</body>
-</html>
+<!-- </body>
+</html> -->
             	

@@ -10,12 +10,10 @@
 <meta charset='UTF-8'>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title> 게시판 목록 </title>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS" crossorigin="anonymous"></script>
 </head>
 <body>
 
-<jsp:include page="/WEB-INF/views/menu.jsp" />
+<%-- <jsp:include page="/WEB-INF/views/menu.jsp" /> --%>
 
 <h1> 게시글 목록 </h1>
 
@@ -48,9 +46,42 @@
 		</c:forEach>
 	</tbody>
 </table>
-
 <a href="${pageContext.request.contextPath}/bbs/add.do"><button type='button' class="btn btn-success"> 글쓰기 </button></a>
-	
+
+<form id="searchForm" action="${pageContext.request.contextPath}/bbs/list.do">
+	<select name="searchType">
+	<%-- 	<option value="title" ${searchInfo.searchType == 'title' ? 'selected' : ''} 	> 제목 </option>
+		<option value="content" ${searchInfo.searchType == 'content' ? 'selected' : ''} 	> 내용 </option>
+		<option value="total" ${searchInfo.searchType == 'total' ? 'selected' : ''} 	> 제목 + 내용 </option>
+		<option value="writer" ${searchInfo.searchType == 'writer' ? 'selected' : ''} 	> 작성자 </option> --%>
+		
+		<option value="title" > 제목 </option>
+		<option value="content" > 내용 </option>
+		<option value="total" > 제목 + 내용 </option>
+		<option value="writer" 	> 작성자 </option>
+	</select>
+	<script type="text/javascript">
+		if ('${searchInfo.searchType}') {
+			/* document.querySelector('[name = "searchType"]').value = '${searchInfo.searchType}'; */
+			/* $('[name = "searchType"]').prop('value', '${searchInfo.searchType}'); */
+			$('[name = "searchType"]').val('${searchInfo.searchType}');
+		}
+		
+	</script>
+	<input type="text" 		name="searchWord" 		value="${searchInfo.searchWord}"/>
+	<input type="hidden" 	name="currentPageNo" 	value="1" />
+	<input type="submit" 	value="검색" />
+</form>
+
+${searchInfo.pageHtml}
+<script>
+ 	function goPage(n) {
+ 		document.querySelector('[name = "currentPageNo"]').value = n;
+ 		document.querySelector('#searchForm').submit();
+	}
+</script>
+
+
 </body>
 </html>
 

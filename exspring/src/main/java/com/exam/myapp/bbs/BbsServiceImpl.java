@@ -32,8 +32,8 @@ public class BbsServiceImpl implements BbsService {
 
 	//게시물 리스트
 	@Override
-	public List<BbsVo> selectBbsList() {
-		return bbsDao.selectBbsList();
+	public List<BbsVo> selectBbsList(SearchInfo info) {
+		return bbsDao.selectBbsList(info);
 	}
 
 	//게시글 추가 트랜잭션
@@ -116,6 +116,11 @@ public class BbsServiceImpl implements BbsService {
 	@Override
 	public File getAttachFile(AttachVo vo) {
 		return new File(uploadPath, vo.getAttNewName());
+	}
+
+	@Override
+	public int selectBbsCount(SearchInfo info) {
+		return bbsDao.selectBbsCount(info);
 	}
 
 }

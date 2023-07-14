@@ -6,7 +6,7 @@ import java.util.List;
 public interface BbsService {
 
 	// 게시물 목록 검색
-	List<BbsVo> selectBbsList();
+	List<BbsVo> selectBbsList(SearchInfo info);
 
 	// 게시글 등록
 	int insertBbs(BbsVo vo);
@@ -24,5 +24,8 @@ public interface BbsService {
 	AttachVo selectAttach(int attNo);
 
 	File getAttachFile(AttachVo vo);
+	
+	//페이징
+	int selectBbsCount(SearchInfo info);
 
 }

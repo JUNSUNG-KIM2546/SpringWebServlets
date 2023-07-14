@@ -28,8 +28,26 @@
 		<!-- bbs_no 컬럼값을 파라미터로 전달하면서 "com.exam.myapp.bbs.AttachDao.selectAttachList"인 SQL문을 실행하고, -->
 		<!-- 그 결과를 attachList 속성값으로 저장 -게시물이 몇개 없을 경우 좋음-  -->
 		<collection property="attachList" ofType="AttachVo" select="com.exam.myapp.bbs.AttachDao.selectAttachList" column="bbs_no" />
-				
 	</resultMap>
+	
+	<sql id="searchCondition">
+		<!-- trim 태그 내부에 내용이 있을 경우에만, 내용 앞에 prefix 속성값을 추가 -->
+		<!-- 내용의 시작 부분이 prefixOverrides 속성값인 경우 그부분을 내용에서 제거 -->
+		<trim prefix="WHERE" prefixOverrides="AND |OR ">
+			<if test="(searchType == 'title' or searchType == 'total') and searchWord != null and searchWord != ''">
+					bbs_title LIKE '%' || #{searchWord} || '%'
+			</if>
+			
+			<if test="(searchType == 'content' or searchType == 'total') and searchWord != null and searchWord != ''">
+				OR 	bbs_content LIKE '%' || #{searchWord} || '%'
+			</if>
+			
+			<if test="searchType == 'writer' and searchWord != null and searchWord != ''">
+				bbs_writer LIKE '%' || #{searchWord} || '%'
+			</if>
+		</trim>
+	</sql>
+	
 	<!-- 등록할 SQL문과 동일한 이름의 태그를 사용하여 SQL을 등록 -->
 	<!-- 이 파일 내에서 해당 SQL문의 고유한 이름을 id 속성값으로 설정 -->
 	<!-- 일반적으로 이 SQL문을 실행할 때 사용할 DAO인터페이스의 메서드 이름을 지정 -->
@@ -37,28 +55,48 @@
 	<select id="selectBbsList" resultType="BbsVo">	<!-- 바티스셋팅(값 true) 해줘야 목록이 뜬다 -->
 	<!-- resultMap속성을 사용하여, id가 MemberMap인 resultMap에 써놓은대로 조회결과를 담도록 설정 -->
 	<!--   <select id="selectMemberList" resultMap="MemberMap"> --> <!-- 리설트맵을 불러와라 -->
-    SELECT 		bbs_no, bbs_title, bbs_writer, bbs_reg_date, bbs_count
-	FROM 		bbs
-	ORDER BY 	bbs_no DESC
-  </select>
+	    SELECT rnum, bbs_no, bbs_title, bbs_writer, bbs_reg_date, bbs_count
+		FROM (
+		  SELECT ROWNUM rnum, bbs_no, bbs_title, bbs_writer, bbs_reg_date, bbs_count
+		  FROM (
+		    SELECT bbs_no, bbs_title, bbs_writer, bbs_reg_date, bbs_count
+		    FROM bbs
+		    <include refid="searchCondition"></include>
+		    ORDER BY bbs_no DESC
+		  )
+		<![CDATA[ WHERE ROWNUM <= #{lastRecordIndex} ]]>
+		)
+		<![CDATA[ WHERE #{firstRecordIndex} < rnum ]]>
+  	</select>
+  
+	<select id="selectBbsCount" resultType="int">	<!-- 바티스셋팅(값 true) 해줘야 목록이 뜬다 -->
+	<!-- resultMap속성을 사용하여, id가 MemberMap인 resultMap에 써놓은대로 조회결과를 담도록 설정 -->
+	<!--   <select id="selectMemberList" resultMap="MemberMap"> --> <!-- 리설트맵을 불러와라 -->
+	    SELECT 		count(*)
+		FROM 		bbs
+		<!-- trim 태그 내부에 내용이 있을 경우에만, 내용 앞에 prefix 속성값을 추가 -->
+		<!-- 내용의 시작 부분이 prefixOverrides 속성값인 경우 그부분을 내용에서 제거 -->
+		<include refid="searchCondition"></include>
+		ORDER BY 	bbs_no DESC
+  	</select>
   
   	<!-- 게시글 상세 -->
 	<select id="selectBbs" resultMap="BbsMap">	<!-- 바티스셋팅(값 true) 해줘야 목록이 뜬다 -->
 	<!-- resultMap속성을 사용하여, id가 MemberMap인 resultMap에 써놓은대로 조회결과를 담도록 설정 -->
 	<!--   <select id="selectMemberList" resultMap="MemberMap"> --> <!-- 리설트맵을 불러와라 -->
-	<!-- SELECT 	bbs_no, bbs_title, bbs_content, bbs_writer, bbs_reg_date, bbs_count, att_no, att_org_name, att_new_name, att_bbs_no
-	FROM 	(
-			  SELECT bbs_no, bbs_title, bbs_content, bbs_writer, bbs_reg_date, bbs_count
-			  FROM	 bbs
-			  WHERE  bbs_no = #{bbsNo}
-			) 
-      		LEFT OUTER JOIN attach ON bbs_no = att_bbs_no;  - 게시물이 많을수록 좋음 - -->
-	
-	SELECT 	bbs_no, bbs_title, bbs_content, bbs_writer, bbs_reg_date, bbs_count
-	FROM	bbs
-	WHERE 	bbs_no = #{bbsNo}
+		<!-- SELECT 	bbs_no, bbs_title, bbs_content, bbs_writer, bbs_reg_date, bbs_count, att_no, att_org_name, att_new_name, att_bbs_no
+		FROM 	(
+				  SELECT bbs_no, bbs_title, bbs_content, bbs_writer, bbs_reg_date, bbs_count
+				  FROM	 bbs
+				  WHERE  bbs_no = #{bbsNo}
+				) 
+	      		LEFT OUTER JOIN attach ON bbs_no = att_bbs_no;  - 게시물이 많을수록 좋음 - -->
+		
+		SELECT 	bbs_no, bbs_title, bbs_content, bbs_writer, bbs_reg_date, bbs_count
+		FROM	bbs
+		WHERE 	bbs_no = #{bbsNo}
   </select>
-  
+ 
   <!--   파라미터(인자)로 받은 객체의 속성값들을 SQL문 내에 사용하기 위해서 #{속성명} 또는 &{속성명} 표현을 사용
   #{속성명} : JDBC의 ? 채우기와 같은 방식으로 동작
   &{속성명} : 문자열 이어붙이기 방식으로 동작 (보안상 위험하므로 가급적 사용자제) -->
@@ -67,8 +105,8 @@
   	<selectKey keyProperty="bbsNo" resultType="int" order="BEFORE"> <!-- 시퀀스값을 먼저 구함 -->
   		SELECT bbs_seq.NEXTVAL  FROM dual	--시퀀스의 다음값(조회 할떄마다 1++한다)
   	</selectKey>
-  	INSERT INTO bbs ( bbs_no, bbs_title, bbs_content, bbs_writer )
-	VALUES ( #{bbsNo}, #{bbsTitle}, #{bbsContent}, #{bbsWriter} )
+	  	INSERT INTO bbs ( bbs_no, bbs_title, bbs_content, bbs_writer )
+		VALUES ( #{bbsNo}, #{bbsTitle}, #{bbsContent}, #{bbsWriter} )
   </insert>
 <!-- SQL문 실행시 전달받는 데이터의 타입을 parameterType 속성에 지정 가능(생략 가능) -->
 <!-- 문자열, 정수 등 단일값을 갖는 데이터를 파라미터(인자)로 받은 경우, #{속성명} 의 속성명에는 어떤 이름을 써도 무방 -->
@@ -76,16 +114,16 @@
 
 	<!-- 게시글 수정 -->
   <update id="updateBbs">
-  	UPDATE bbs
-  	SET  bbs_title = #{bbsTitle}, bbs_content = #{bbsContent}
-  	WHERE bbs_no = #{bbsNo} AND bbs_writer = #{bbsWriter}
+	  UPDATE bbs
+	  SET  bbs_title = #{bbsTitle}, bbs_content = #{bbsContent}
+	  WHERE bbs_no = #{bbsNo} AND bbs_writer = #{bbsWriter}
   </update>
   
   <!-- 게시글 삭제 -->
   <delete id="deleteBbs">
-  DELETE
-  FROM bbs
-  WHERE bbs_no = #{bbsNo}
+	  DELETE
+	  FROM bbs
+	  WHERE bbs_no = #{bbsNo}
   </delete>
   
 </mapper>

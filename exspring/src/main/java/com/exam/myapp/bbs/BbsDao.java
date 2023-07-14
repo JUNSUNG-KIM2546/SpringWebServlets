@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface BbsDao {
 
 	// 게시물 검색
-	List<BbsVo> selectBbsList();
+	List<BbsVo> selectBbsList(SearchInfo info);
 
 	// 게시글 등록
 	int insertBbs(BbsVo vo);
@@ -21,5 +21,8 @@ public interface BbsDao {
 	
 	// 게시글 수정(게시글 불러오기)
 	BbsVo selectBbs(int memId);
+	
+	// 페이징
+	int selectBbsCount(SearchInfo info);
 
 }

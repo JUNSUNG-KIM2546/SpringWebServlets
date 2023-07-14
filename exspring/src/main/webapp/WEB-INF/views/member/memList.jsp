@@ -3,18 +3,16 @@
     
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
 <meta charset='UTF-8'>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>회원 관리</title>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS" crossorigin="anonymous"></script>
 </head>
-<body>
+<body> -->
 
-<jsp:include page="/WEB-INF/views/menu.jsp" />
+<%-- <jsp:include page="/WEB-INF/views/menu.jsp" /> --%>
 
 <h1> 회원 목록 </h1>
 <%-- <a href='<%=request.getContextPath()%>/member/add2.do'><button type='button'> 회원 추가 </button></a> --%><!-- 이건 안쓰는 방법 -->
@@ -48,11 +46,8 @@ for (MemberVo vo : List) {   c:forEach로 처리 = <%=vo.getMemPoint()%> 를 ${v
 	
 	</p>
 </c:forEach>	
-<%-- <% 
-}
-%>	 --%>
 
-</body>
-</html>
+<!-- </body>
+</html> -->
 
 
