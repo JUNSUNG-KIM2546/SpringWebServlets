@@ -70,6 +70,14 @@
 	<!-- 스프링 XML 설정파일 또는 @value 에서 ${프로퍼티키} 표현으로 프로퍼티값을 사용 가능 -->
 	<context:property-placeholder location="classpath:config/file.properties"/>
 	
+	
+	<!-- 스프링 애플리케이션에서 공유하여 사용할 수 있는 메시지들을 저장하고 있는 메시지소스 등록 -->
+	<!-- 프로퍼티파일에 저장된 메시지를 읽어서 저장하는 메시지소스객체를 ㅡessageSource 라는 이름으로 등록 -->
+	<beans:bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<beans:property name="basename" value="msg"></beans:property>
+	</beans:bean>
+	
+	
 	<!-- 데이터베이스 입출력을 위한 객체들을 등록하는 부분 -->
 	
 	<!-- 스프링의 트랜잭션 설정 방식 -->
