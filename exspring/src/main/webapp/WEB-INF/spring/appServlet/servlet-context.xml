@@ -17,7 +17,10 @@
 	<annotation-driven /> <!-- 자동 등록 -->
 
 	<!-- "/resources/**" 경로로 GET방식 요청을 받으면, "/resources/**" 파일을 찾아서 응답으로 전송하는 컨트롤러(핸들러)를 등록 -->
-	<resources mapping="/resources/**" location="/resources/" />
+	<!-- <resources mapping="/resources/**" location="/resources/" /> -->
+	
+	<!-- 요청주소를 컨트롤러에서 찾지 못했을때, 요청처리를 서버(톰캣)의 디폴트서블릿에게 위입하는 핸들러를 등록 -->
+	<default-servlet-handler/>
 
 	<!-- 컨트롤러(@Controller)에서 뷰이름(문자열)을 반환한 경우, 반환한 뷰이름의 앞과 뒤에 "/WEB-INF/views/" 와 ".jsp"를 붙인 후,
 		해당 경로로 이동(forward)시키도록 설정  -->
@@ -57,7 +60,7 @@
 	<interceptors>
 		<interceptor>
 			<!-- 인터셉터를 실행할 요청 경로(주소) 설정 -->
-			<mapping path="/**"/>
+			<mapping path="/**/*.do"/>
 			<!-- 인터셉터를 실행하지 않을 요청 경로(주소) 설정 -->
 			<exclude-mapping path="/member/login.do" />
 			<exclude-mapping path="/member/add.do" />

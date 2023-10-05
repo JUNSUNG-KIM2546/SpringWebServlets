@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AJAX</title>
+</head>
+<body>
+	<h1>AJAX TEST</h1>
+	
+	<form action="" id="myform">
+		X : <input type="number" name="x" value="3">
+		Y : <input type="number" name="y" value="6">
+		<input type="button" value="전송" id="send">
+		<input type="button" value="전송2" id="send2">
+	</form>
+	<h1 id="result"></h1>
+	<script type="text/javascript">
+		let mf = document.querySelector('#myform');
+		let resElm = document.querySelector('#result');
+		let xInp = document.querySelector('[name="x"]');
+		let yInp = document.querySelector('[name="y"]');
+		
+		document.querySelector('#send').onclick = function() {
+			let xhr = new XMLHttpRequest();	// AJAX 요청 전송 및 응답수신을 담당하는 객체
+			xhr.responseType = 'json';	// 'text', 'json', 'document', 'blob', 'arraybuffer' 사용 가능
+			xhr.onload = function() {	// 성공적으로 응답을 받았을 때 실행
+				console.log('성공');
+				console.log(xhr.status);	// 응답상태코드(404, 400, 200 등)
+				console.log(xhr.getResponseHeader('Content-Type'));	// 응답헤더값 
+				//console.log(xhr.responseText);	// 응답내용을 문자열로 저장
+				//console.log(xhr.responseXML);	// 응답내용을 XML문서로 파싱한 document 객체를 저장
+				//console.log(xhr.response);	// 응답내용을 responseType 설정에 따라 적정한 변환을 결과를 저장
+				//resElm.innerHTML = xhr.responseText;	// ==='{"min":-3.0,"mul":18.0,"sum":9.0,"nm":0.5}'
+				
+				// JSON.parse('JSON문자열') === 자바스크립트 객체
+				// JSON.stringify(자바스크립트 객체) === 'JSON문자열'
+				//let data = JSON.parse( xhr.responseText );	// {"min":-3.0,"mul":18.0,"sum":9.0,"nm":0.5} -> {min:-3.0,mul:18.0,sum:9.0,nm:0.5}
+				//let data = JSON.parse( xhr.response );
+				// xhr.responseType = 'json' 으로 설정한 경우, response 속성에는 JSON 문자열을 자바스크립트객체로 변환한 결과가 저장
+				let data = xhr.response;
+				resElm.innerHTML = '합: ' + data.sum + ' | 곱: ' + data.mul + ' | 빼기: ' + data.min + ' | 나누기: ' + data.nm;
+			};
+			xhr.onerror = function() {	// 요청에 대한 응답을 받지 못하고 실패한 경우 실행
+				console.log('실패');
+			};
+			xhr.onloadend = function() {	// 성공 또는 실패에 관계없이 요청 처리가 끝난 경우 실행
+				console.log('종료');
+			};
+			// GET 방식
+			//xhr.open('GET', '/myapp/cal?x=' + xInp.value + '&y=' + yInp.value );	// 요청 방식과 주소 설정
+			// URLSearchParams : 객체 형태의 파라미터 값들을 파라미터문자열로 변환해주는 객체
+			//xhr.open('GET', '/myapp/cal?' + new URLSearchParams('x=' + xInp.value + '&y=' + yInp.value).toString() );	// 요청 방식과 주소 설정
+			//xhr.open('GET', '/myapp/cal?' + new URLSearchParams({x: xInp.value, y: yInp.value}).toString() );	// 요청 방식과 주소 설정
+			//xhr.open('GET', '/myapp/cal?' + new URLSearchParams( new FormData(mf) ).toString() );	// 요청 방식과 주소 설정
+			
+			// POST 방식
+			xhr.open('POST', '/myapp/cal');	// 요청 방식과 주소 설정
+			xhr.setRequestHeader('Accept','application/json');	// 요청헤더 값 설정
+			//xhr.send( new URLSearchParams({x: xInp.value, y: yInp.value}) );	// 요청전송 (메시지본문에 담아서 전송할 데이터를 인자로 전달)
+			xhr.send( new FormData(mf) );	// 요청전송 (메시지본문에 담아서 전송할 데이터를 인자로 전달)
+		};
+		
+		document.querySelector('#send2').onclick = function() {
+			fetch('/myapp/cal', {
+				method: 'POST',
+				body: new FormData(mf)
+			}).then(function(response) {
+				return response.json();
+			}).then(function(data) {	// response.json();의 결과가 인자로 전달
+				resElm.innerHTML = '합: ' + data.sum + ' | 곱: ' + data.mul + ' | 빼기: ' + data.min + ' | 나누기: ' + data.nm;
+			}).catch(function(error) {
+				console.log(error);
+			});
+			
+			/* fetch('요청주소', {method: '요청방식', 
+							 headers: {'요청헤더명': '요청헤더값', '요청헤더명': '요청헤더값'},
+							 body: 요청메시지 본문에 담아서 전송할 데이터(문자열, URLSearchParams, FormData()사용가능)
+							}).then(function(response) {	// 성공적으로 응답을 받은 경우 실행
+								console.log(response.status);	// 응답상태코드
+								console.log(response.ok);	// 응답상태코드가 200~299인지 여부
+								console.log(response.headers.get('응답헤더명'));	// 응답헤더값
+								console.log(response.body);	// 응답내용(본문)을 읽을 수 있는 스트림
+								// 응답내용을 다양한 타입으로 변환해주는 메서드 존재
+								response.text()	// 응답내용을 문자열로 변환
+								response.json()	// 응답내용을 JSON문자열로 해석하여 자바스크립트객체로 변환
+								response.blob()	// 응답내용을 Blob 객체로 변환
+								response.arraybuffer()	// 응답내용을 arraybuffer() 객체로 변환
+								response.FormData()	// 응답내용을 FormData 객체로 변환
+							}).catch(function(error) {		// 실패했을 때 실행
+								
+							}).finally(function(error) {	// 성공이든 실패든 요청처리가 종료된 후 실행
+								
+							}) */
+		}
+		
+	</script>
+</body>
+</html>
