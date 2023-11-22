@@ -51,7 +51,7 @@
 	<!-- 회원 수정 -->
   <update id="updateMember" parameterType="com.exam.myapp.member.MemberVo">
   	UPDATE MEMBER
-  	SET mem_Pass = #{memPass}, mem_Name = #{memName} , mem_Point = #{memPoint}
+  	SET mem_Name = #{memName} , mem_Point = #{memPoint}
   	WHERE mem_ID = #{memId}
   </update>
   

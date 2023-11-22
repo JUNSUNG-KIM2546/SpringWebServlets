@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 //Bean Validation 2.0부터 사용가능
 // @NotEmpty, @NotBlank, @Email, @Positive, @PositiveOrZero, @Negative, @NegativeOrZero
 public class MemberVo {
-	@NotNull @Size(max = 10, min = 4) @Email	//최대 10자리 , 최소 4자리
+	@NotNull @Size(max = 10, min = 4) 	//최대 10자리 , 최소 4자리 @email
 	private String memId;
 	@NotNull @Size(max = 10, min = 3)	//최대 10자리 , 최소 3자리
 	private String memPass;

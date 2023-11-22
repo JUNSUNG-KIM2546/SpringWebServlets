@@ -99,8 +99,8 @@
 	<beans:bean id="ds" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
 		<beans:property name="driverClassName" 	value="oracle.jdbc.OracleDriver" />
 		<beans:property name="url" 				value="jdbc:oracle:thin:@localhost:1521:xe" />
-		<beans:property name="username" 		value="WEB" />
-		<beans:property name="password" 		value="WEB01" />
+		<beans:property name="username" 		value="web" />
+		<beans:property name="password" 		value="web01" />
 	</beans:bean>
 	
   <!-- 마이바티스 설정 -->

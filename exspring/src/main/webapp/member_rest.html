@@ -50,7 +50,7 @@
             let rowTemp = document.querySelector('#row');
 			
             function refreshList() {
-            	fetch('/myapp/api/member/list', {
+            	fetch('/myapp/rest/members', {
     				method: 'GET',
     				//body: new FormData(mf)
     			}).then(response => response.json())
@@ -103,9 +103,9 @@
             // 삭제 버튼
             delBtn.onclick = function() {
                 if(sf.classList.contains('mod')) {  //삭제
-                	fetch('/myapp/api/member/del?memId=' + noInp.value, {
-                    /* fetch('/myapp/api/member/edit?memId=' + new URLSearchParams({memId:noInp.value}).toString(), { */
-            			method: 'GET',
+                	//fetch(`/myapp/rest/members/${noInp.value}` , {
+                	fetch('/myapp/rest/members/' + noInp.value, {
+            			method: 'DELETE',
             		}).then(response => response.json())
             		.then(function(data) {	// response.json();의 결과가 인자로 전달
             			console.log(data);
@@ -122,15 +122,25 @@
             
             // 저장버튼
             saveBtn.onclick = function() {
-                let reqUrl = '/myapp/api/member/add';	// 추가요청주소
+                let reqUrl = '/myapp/rest/members';	// 추가요청주소
+                let reqMethod = 'POST';
             	
             	if(sf.classList.contains('mod')) {  	// 변경모드인경우
-            		reqUrl = '/myapp/api/member/edit';	// 변경요청주소
+            		reqUrl = '/myapp/rest/members/' + noInp.value ;	// 변경요청주소
+            		reqMethod = 'PATCH';
             	}
-                	
+                /* let reqData = { memId:noInp.value 
+                				, memPass:passInp.value 
+                				, memName:nameInp.value 
+                				, memPoint:scoreInp.value 
+                			  }; */
+                //let reqData = {};
+				//new FormData(sf).forEach((v,k) => reqData[k] = v); 
+				let reqData = Object.fromEntries(new FormData(sf).entries());
             	fetch(reqUrl, {
-        			method: 'POST',
-        			body: new FormData(sf)
+        			method: reqMethod,
+        			headers : { 'Content-Type' : 'application/json' },	// 요청메시지 본문 내용의 데이터 형신을 서버에게 알림
+        			body: JSON.stringify(reqData)	// 제이슨으로 변환
         		}).then(response => response.json())
         		.then(function(data) {	// response.json();의 결과가 인자로 전달
         			console.log(data);
@@ -142,8 +152,6 @@
         			alert('회원 추가 실패');
         		});
             };
-
-            
             
             //3.변경버튼을 클릭하면, 클릭한 학생 정보를 stuForm에 출력
             //  3-1. stuForm의 학생정보를 변경하고 저장버튼을 클릭하면, studentList에서 해당 학생정보를 변경
@@ -154,8 +162,8 @@
                 if(e.target.matches('.edit')) { //지정한 CSS선택자와 일치하는지 여부
                     let no = e.target.getAttribute('data-no');
                 
-                    fetch('/myapp/api/member/edit?memId=' + no, {
-                    /* fetch('/myapp/api/member/edit?memId=' + new URLSearchParams({memId:no}).toString(), { */
+                    fetch(`/myapp/rest/members/${no}`, {
+                    /* fetch('/myapp/rest/members/' +no, { */
         				method: 'GET',
         			}).then(response => response.json())
         			.then(function(data) {	// response.json();의 결과가 인자로 전달
